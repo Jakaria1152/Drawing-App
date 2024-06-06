@@ -1,7 +1,8 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-void main()=>runApp(const myApp());
+
+void main() => runApp(const myApp());
 
 class myApp extends StatelessWidget {
   const myApp({super.key});
@@ -25,7 +26,7 @@ class DrawingBoard extends StatefulWidget {
 class _DrawingBoardState extends State<DrawingBoard> {
   Color selectedColor = Colors.black;
   double strokeWidth = 5;
-  List<DrawingPoint> drawingPoints = [];
+  List<DrawingPoint?> drawingPoints = [];
   List<Color> colors = [
     Colors.pink,
     Colors.red,
@@ -34,42 +35,47 @@ class _DrawingBoardState extends State<DrawingBoard> {
     Colors.blue,
     Colors.purple,
     Colors.green,
-
   ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
           GestureDetector(
-            onPanStart: (details){
-             setState(() {
-               drawingPoints.add(
-                   DrawingPoint(details.localPosition,
-                       Paint()..color = selectedColor
-                         ..isAntiAlias = true
-                         ..strokeWidth = strokeWidth
-                         ..strokeCap = StrokeCap.round   // change to square to see effect
-          
-                   )
-               );
-             });
+            onPanStart: (details) {
+              setState(() {
+                drawingPoints.add(
+                  DrawingPoint(
+                    details.localPosition,
+                    Paint()
+                      ..color = selectedColor
+                      ..isAntiAlias = true
+                      ..strokeWidth = strokeWidth
+                      ..strokeCap = StrokeCap.round,
+                  ),
+                );
+              });
             },
-            onPanUpdate: (details){
-             setState(() {
-               drawingPoints.add(
-                   DrawingPoint(details.localPosition,
-                       Paint()..color = selectedColor
-                         ..isAntiAlias = true
-                         ..strokeWidth = strokeWidth
-                         ..strokeCap = StrokeCap.round   // change to square to see effect
-          
-                   )
-               );
-             });
+            onPanUpdate: (details) {
+              setState(() {
+                drawingPoints.add(
+                  DrawingPoint(
+                    details.localPosition,
+                    Paint()
+                      ..color = selectedColor
+                      ..isAntiAlias = true
+                      ..strokeWidth = strokeWidth
+                      ..strokeCap = StrokeCap.round,
+                  ),
+                );
+              });
             },
-            onPanEnd: (details){
-              drawingPoints.add(null!);
+            onPanEnd: (details) {
+              // if miss set State previous line add to new line error
+              setState(() {
+                drawingPoints.add(null);
+              });
             },
             child: CustomPaint(
               painter: _DrawingPainter(drawingPoints: drawingPoints),
@@ -79,27 +85,34 @@ class _DrawingBoardState extends State<DrawingBoard> {
               ),
             ),
           ),
-          Positioned(top: 40,right: 30,
+          Positioned(
+            top: 40,
+            right: 30,
             child: Row(
               children: [
                 Slider(
                   min: 0,
-                    max: 40,
-                    value: strokeWidth, onChanged: (val){
-               setState(() {
-                 strokeWidth = val;
-
-               });
-                }),
-                ElevatedButton.icon(onPressed: (){
-                 setState(() {
-                   drawingPoints = [];
-                 });
-                }, label: Text('Clear Board'),icon: Icon(Icons.clear),),
+                  max: 40,
+                  value: strokeWidth,
+                  onChanged: (val) {
+                    setState(() {
+                      strokeWidth = val;
+                    });
+                  },
+                ),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    setState(() {
+                      drawingPoints = [];
+                    });
+                  },
+                  label: const Text('Clear Board'),
+                  icon: const Icon(Icons.clear),
+                ),
               ],
-            ),)
+            ),
+          ),
         ],
-        
       ),
       bottomNavigationBar: BottomAppBar(
         child: Container(
@@ -107,7 +120,10 @@ class _DrawingBoardState extends State<DrawingBoard> {
           padding: const EdgeInsets.all(10),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: List.generate(colors.length, (index)=>_buildColorChoose(colors[index]),),
+            children: List.generate(
+              colors.length,
+                  (index) => _buildColorChoose(colors[index]),
+            ),
           ),
         ),
       ),
@@ -118,52 +134,47 @@ class _DrawingBoardState extends State<DrawingBoard> {
     bool isSelected = selectedColor == color;
 
     return GestureDetector(
-      onTap: ()=>setState(() => selectedColor = color
-)
-      ,
+      onTap: () => setState(() => selectedColor = color),
       child: Container(
-                height:isSelected? 47:40,
-                width: isSelected?47:40,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: color,
-                  border:isSelected ?Border.all(color: Colors.white,
-                  width: 3):null
-                ),
-              ),
+        height: isSelected ? 47 : 40,
+        width: isSelected ? 47 : 40,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: color,
+          border: isSelected
+              ? Border.all(color: Colors.white, width: 3)
+              : null,
+        ),
+      ),
     );
   }
 }
 
-
-class _DrawingPainter extends CustomPainter{
-  final List<DrawingPoint> drawingPoints;
+class _DrawingPainter extends CustomPainter {
+  final List<DrawingPoint?> drawingPoints;
   _DrawingPainter({required this.drawingPoints});
   List<Offset> offsetList = [];
+
   @override
   void paint(Canvas canvas, Size size) {
-for(int i=0; i<drawingPoints.length; i++)
-  {
-    if(drawingPoints[i] != null && drawingPoints[i+1] != null)
-      {
-        canvas.drawLine(drawingPoints[i].offset, drawingPoints[i+1].offset, drawingPoints[i].paint);
-      }
-    else if(drawingPoints[i]!=null && drawingPoints[i+1] == null)
-      {
+    for (int i = 0; i < drawingPoints.length - 1; i++) {
+      if (drawingPoints[i] != null && drawingPoints[i + 1] != null) {
+        canvas.drawLine(drawingPoints[i]!.offset, drawingPoints[i + 1]!.offset,
+            drawingPoints[i]!.paint);
+      } else if (drawingPoints[i] != null && drawingPoints[i + 1] == null) {
         offsetList.clear();
-        offsetList.add(drawingPoints[i].offset);
+        offsetList.add(drawingPoints[i]!.offset);
 
-        canvas.drawPoints(PointMode.points, offsetList, drawingPoints[i].paint);
+        canvas.drawPoints(PointMode.points, offsetList, drawingPoints[i]!.paint);
       }
-  }
+    }
   }
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
-
 }
 
-class DrawingPoint{
+class DrawingPoint {
   Offset offset;
   Paint paint;
 
