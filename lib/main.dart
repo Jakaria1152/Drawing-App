@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 void main() => runApp(const myApp());
 
@@ -11,10 +13,37 @@ class myApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: DrawingBoard(),
+      home: SplashScreen(),
     );
   }
 }
+
+class SplashScreen extends StatefulWidget {
+  const SplashScreen({super.key});
+
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    Timer(Duration(milliseconds: 1800), ()=>Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => DrawingBoard(),)));
+  }
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+body: Center(
+  child: Animate(
+      effects: [FadeEffect(duration: Duration(milliseconds: 600)), ScaleEffect(duration: Duration(milliseconds: 600))],
+      child: Image.asset('images/jakaria profile picture.jpg')),
+),
+    );
+  }
+}
+
 
 class DrawingBoard extends StatefulWidget {
   const DrawingBoard({super.key});
