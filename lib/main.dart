@@ -55,6 +55,7 @@ class DrawingBoard extends StatefulWidget {
 class _DrawingBoardState extends State<DrawingBoard> {
   Color selectedColor = Colors.black;
   double strokeWidth = 5;
+  // ai list gulo canvas a draw kora hobe
   List<DrawingPoint?> drawingPoints = [];
   List<Color> colors = [
     Colors.pink,
@@ -76,8 +77,8 @@ class _DrawingBoardState extends State<DrawingBoard> {
               setState(() {
                 drawingPoints.add(
                   DrawingPoint(
-                    details.localPosition,
-                    Paint()
+                    details.localPosition,  // point location a neya hosse
+                    Paint()  // oi point a aigulo draw hosse jeta invissible
                       ..color = selectedColor
                       ..isAntiAlias = true
                       ..strokeWidth = strokeWidth
@@ -88,6 +89,7 @@ class _DrawingBoardState extends State<DrawingBoard> {
             },
             onPanUpdate: (details) {
               setState(() {
+                // previous list er sathe add hosse
                 drawingPoints.add(
                   DrawingPoint(
                     details.localPosition,
@@ -103,12 +105,14 @@ class _DrawingBoardState extends State<DrawingBoard> {
             onPanEnd: (details) {
               // if miss set State previous line add to new line error
               setState(() {
+                // point end hosse
                 drawingPoints.add(null);
               });
             },
             child: CustomPaint(
               painter: _DrawingPainter(drawingPoints: drawingPoints),
               child: Container(
+                // total space draw korar
                 height: MediaQuery.of(context).size.height,
                 width: MediaQuery.of(context).size.width,
               ),
@@ -150,6 +154,7 @@ class _DrawingBoardState extends State<DrawingBoard> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: List.generate(
+              // very useful this list generate with pass parameter
               colors.length,
                   (index) => _buildColorChoose(colors[index]),
             ),
@@ -186,6 +191,7 @@ class _DrawingPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    // invissible list ke aibar canvas a draw kore visible kora hobe
     for (int i = 0; i < drawingPoints.length - 1; i++) {
       if (drawingPoints[i] != null && drawingPoints[i + 1] != null) {
         canvas.drawLine(drawingPoints[i]!.offset, drawingPoints[i + 1]!.offset,
